@@ -14,6 +14,8 @@ public:
     //²Ûº¯Êý
     void open_clicked();
     void save_clicked();
+    void rectangle_clicked();
+    void gray_clicked();
     
     //»æÍ¼ÊÂ¼þ
     //void paintEvent(QPaintEvent *);
@@ -27,5 +29,4 @@ private:
     bool isOpenFile;
     QImage img;
     Mat srcImg,hslImg;
-    
 };
