@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Lab_01</class>
- <widget class="QMainWindow" name="Lab_01">
+ <class>Lab_01Class</class>
+ <widget class="QMainWindow" name="Lab_01Class">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -53,19 +53,6 @@
      <string>保存</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>391</x>
-      <y>174</y>
-      <width>301</width>
-      <height>221</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QPushButton" name="rectangle">
     <property name="geometry">
      <rect>
@@ -76,13 +63,13 @@
      </rect>
     </property>
     <property name="text">
-     <string>绘制矩形区域</string>
+     <string>开始绘制</string>
     </property>
    </widget>
    <widget class="QPushButton" name="gray">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>480</x>
       <y>10</y>
       <width>93</width>
       <height>28</height>
@@ -92,18 +79,64 @@
      <string>灰度图</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="hhh">
+   <widget class="QPushButton" name="checkout">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>380</x>
       <y>10</y>
       <width>93</width>
       <height>28</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>确定</string>
     </property>
+   </widget>
+   <widget class="QPushButton" name="pseudo">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>10</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>伪彩图</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="log" native="true">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>150</y>
+      <width>185</width>
+      <height>46</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>r值</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinBox1">
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="horizontalSlider1">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -130,5 +163,57 @@
  <resources>
   <include location="Lab_01.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>spinBox1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider1</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>771</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>841</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox1</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>844</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>774</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Lab_01Class</receiver>
+   <slot>log_Changed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>774</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>498</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>log_Changed(int)</slot>
+ </slots>
 </ui>

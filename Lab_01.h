@@ -1,5 +1,4 @@
 #pragma once
-
 #include <QtWidgets/QMainWindow>
 #include"ui_Lab_01.h"
 #include <opencv2/opencv.hpp>
@@ -11,22 +10,22 @@ class Lab_01 : public QMainWindow
 
 public:
     Lab_01(QWidget *parent = Q_NULLPTR);
-    //槽函数
+
+private slots:
     void open_clicked();
     void save_clicked();
     void rectangle_clicked();
+    void checkout_clicked();
     void gray_clicked();
-    
-    //绘图事件
-    //void paintEvent(QPaintEvent *);
-    //bool eventFilter(QObject* obj, QEvent* event);//事件过滤器
+    void pseudoColor_clicked();
+    void log_Changed(int);
 
 private:
-    Ui::Lab_01 ui;
+    Ui::Lab_01Class ui;
 
     QString imgPath;
     QString savePath;
     bool isOpenFile;
     QImage img;
-    Mat srcImg,hslImg;
+    Mat srcImg, grayImg, pseImg, logImg, hslImg;
 };
