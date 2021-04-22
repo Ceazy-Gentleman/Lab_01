@@ -1,4 +1,5 @@
-﻿#include "Lab_01.h"
+﻿#pragma execution_character_set("utf-8")
+#include "Lab_01.h"
 #include <QFileDialog>
 #include <QLabel>
 #include <QtCore/qmath.h>
@@ -36,12 +37,13 @@ Lab_01::Lab_01(QWidget *parent)
         });
 
 } 
-//生成日志
 
 
 //打开图片
 void Lab_01::open_clicked() {
     imgPath = QFileDialog::getOpenFileName(this, "请选择图片", ".", "Image Files(*.jpg *.png *.bmp *.pgm *.pbm);;All(*.*)");
+    double time0 = static_cast<double>(getTickCount());
+
     if (img.load(imgPath)) {
         Mat img1;
         srcImg= imread(imgPath.toUtf8().data());
@@ -49,10 +51,18 @@ void Lab_01::open_clicked() {
         QImage img2 = QImage((const unsigned char*)(img1.data), img1.cols, img1.rows, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
         ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
         img = (ui.unIabel->pixmap()->toImage()).copy();
+
+        time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+        qDebug("——————————————————————————————————————————————————————————————————————");
+        qDebug() << "成功打开图片" << "  耗时：" << time0 << "ms";
+        ui.statusBar->showMessage("加载图片, 耗时：" + QString("%1").arg(time0) + "ms");
+
     }
 }
 //绘制矩形框
 void Lab_01::rectangle_clicked() {
+    double time0 = static_cast<double>(getTickCount());
+
     //读取图片及参数
     QImage img2;
     img2 = img;
@@ -69,19 +79,33 @@ void Lab_01::rectangle_clicked() {
 
     //显示图片
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+    time0 = 1000*((double)getTickCount() - time0) / getTickFrequency();
+    qDebug()<<"成功绘制矩形框"<<"  耗时："<<time0<<"ms";
+    ui.statusBar->showMessage("绘制ROI, 耗时：" + QString("%1").arg(time0) + "ms");
+
 }//todo 1.利用绘图事件实现鼠标画图功能 2.参数调整按钮
 
 //选取矩形框
 void Lab_01::checkout_clicked() {
+    double time0 = static_cast<double>(getTickCount());
+
     img2 = (ui.unIabel->pixmap()->toImage()).copy(QRect(x, y, width, height));
     srcImg = Mat(img2.height(), img2.width(), CV_8UC4, (void*)img2.constBits(), img2.bytesPerLine()).clone();//QImage转Mat,图像数据共享内存了。。。
     imshow("显示图像", srcImg);
     //imshow("显示图像", srcImg);
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    qDebug() << "成功选取选定区域" << "  耗时：" << time0 << "ms";
+    ui.statusBar->showMessage("选取ROI, 耗时：" + QString("%1").arg(time0) + "ms");
+
 }
 //保存图片
 void Lab_01::save_clicked() {
     savePath= QFileDialog::getSaveFileName(this,"保存图片","",tr("*.bmp;; *.png;; *.jpg;; *.tif;; *.GIF"));
+    double time0 = static_cast<double>(getTickCount());
+
     img2 = ui.unIabel->pixmap()->toImage();
     if (savePath.isEmpty())
     {
@@ -94,13 +118,18 @@ void Lab_01::save_clicked() {
             QMessageBox::information(this,"error",tr("Failed to save the image!"));
             return;
         }
-        ui.statusBar->showMessage("Successfully");
+
+        time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+        ui.statusBar->showMessage("保存图片, 耗时："+ QString("%1").arg(time0)+"ms");
+        qDebug() << "成功保存图片" << "  耗时：" << time0 << "ms";
     }
 }
 
 
 //灰度化
 void Lab_01::gray_clicked() {
+    double time0 = static_cast<double>(getTickCount());
+
     cvtColor(srcImg, grayImg, CV_BGR2GRAY);
     imshow("显示图像", srcImg);
     img2 = QImage((const unsigned char*)(grayImg.data), grayImg.cols, grayImg.rows, grayImg.step, QImage::Format_Grayscale8);
@@ -108,19 +137,33 @@ void Lab_01::gray_clicked() {
         QMessageBox::warning(this, "提示", "图片转换错误", QMessageBox::Yes | QMessageBox::Yes);
     }
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    qDebug() << "灰度处理" << "  耗时：" << time0 << "ms";
+    ui.statusBar->showMessage("灰度变换, 耗时：" + QString("%1").arg(time0) + "ms");
+
 }
 
 
 //伪彩色图
 void Lab_01::pseudoColor_clicked() {
+    double time0 = static_cast<double>(getTickCount());
+
     applyColorMap(grayImg, pseImg, COLORMAP_JET);
     img2 = QImage((const unsigned char*)(pseImg.data), pseImg.cols, pseImg.rows, pseImg.step, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    ui.statusBar->showMessage("伪彩色图变换, 耗时：" + QString("%1").arg(time0) + "ms");
+    qDebug() << "生成伪彩色图" << "  耗时：" << time0 << "ms";
+
 }
 
 //对数变换
 void Lab_01::log_Changed(int c)
 {
+    double time0 = static_cast<double>(getTickCount());
+
     //预处理
     imshow("对数图片", grayImg);
     Mat grayImg1 = grayImg.clone();
@@ -137,12 +180,18 @@ void Lab_01::log_Changed(int c)
     logImg.convertTo(logImg, CV_8UC1);
     img2 = QImage((const unsigned char*)logImg.data, logImg.cols, logImg.rows, logImg.step, QImage::Format_Grayscale8);
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    ui.statusBar->showMessage("对数变换, 耗时：" + QString("%1").arg(time0) + "ms");
+    qDebug() << "对数变换" << "  耗时：" << time0 << "ms";
 }
 
 //伽马变换
 
 void Lab_01::gamma_Changed(double r)
 {
+    double time0 = static_cast<double>(getTickCount());
+
     //预处理
     Mat grayImg1 = grayImg.clone();
     imshow("对数图片", grayImg1);
@@ -157,6 +206,10 @@ void Lab_01::gamma_Changed(double r)
     img2 = QImage((const unsigned char*)gammaImg.data, gammaImg.cols, gammaImg.rows, gammaImg.step, QImage::Format_Grayscale8);
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
 
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    ui.statusBar->showMessage("伽马变换, 耗时：" + QString("%1").arg(time0) + "ms");
+    qDebug() << "伽马变换" << "  耗时：" << time0 << "ms";
+
 }
 
 
@@ -164,6 +217,8 @@ void Lab_01::gamma_Changed(double r)
 void Lab_01::hsl_Changed(int value) 
 {
     Q_UNUSED(value);
+    double time0 = static_cast<double>(getTickCount());
+
 
     //预处理
     Mat srcImg1,final;
@@ -192,19 +247,32 @@ void Lab_01::hsl_Changed(int value)
     img2 = QImage((const unsigned char*)hslImg.data, hslImg.cols, hslImg.rows, hslImg.step, QImage::Format_RGB888);
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
 
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    ui.statusBar->showMessage("hsl变换, 耗时：" + QString("%1").arg(time0) + "ms");
+    qDebug() << "hsl调整" << "  耗时：" << time0 << "ms";
 }
 
 //直方图均衡
 void Lab_01::histogram_Balanced() {
+
     Mat equalImg;   
     vector<Mat> channels;
     if (gray) {
+        double time0 = static_cast<double>(getTickCount());
+
         imshow("灰度图", grayImg);
         equalizeHist(grayImg, equalImg);
         img2 = QImage((const unsigned char*)(grayImg.data), grayImg.cols, grayImg.rows, grayImg.step, QImage::Format_Grayscale8);
         ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+        time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+        ui.statusBar->showMessage("灰度直方图均衡, 耗时：" + QString("%1").arg(time0) + "ms");
+        qDebug() << "灰度直方图均衡" << "  耗时：" << time0 << "ms";
+
     }
     else {
+        double time0 = static_cast<double>(getTickCount());
+
         //图像转换
         cvtColor(srcImg, equalImg, CV_BGRA2BGR);
         imshow("k", equalImg);
@@ -219,6 +287,10 @@ void Lab_01::histogram_Balanced() {
         cvtColor(equalImg, equalImg, CV_YCrCb2RGB);
         img2 = QImage((const unsigned char*)(equalImg.data), equalImg.cols, equalImg.rows, equalImg.step, QImage::Format_RGB888);
         ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+        time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+        ui.statusBar->showMessage("彩色直方图均衡, 耗时：" + QString("%1").arg(time0) + "ms");
+        qDebug() << "彩色直方图均衡" << "  耗时：" << time0 << "ms";
     }
 }
 

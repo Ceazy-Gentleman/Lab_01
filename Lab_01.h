@@ -1,6 +1,9 @@
 #pragma once
 #include <QtWidgets/QMainWindow>
 #include"ui_Lab_01.h"
+#include <QtDebug>
+#include <QFile>
+#include <QTextStream>
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
