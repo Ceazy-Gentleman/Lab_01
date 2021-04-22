@@ -10,6 +10,8 @@ class Lab_01 : public QMainWindow
 
 public:
     Lab_01(QWidget *parent = Q_NULLPTR);
+    void outputMessage(QtMsgType, const QMessageLogContext&, const QString&);
+
 
 private slots:
     void open_clicked();
@@ -19,13 +21,17 @@ private slots:
     void gray_clicked();
     void pseudoColor_clicked();
     void log_Changed(int);
-
+    void gamma_Changed(double);
+    void hsl_Changed(int);
+    void histogram_Balanced();
 private:
     Ui::Lab_01Class ui;
 
+    bool gray ;
     QString imgPath;
     QString savePath;
-    bool isOpenFile;
-    QImage img;
-    Mat srcImg, grayImg, pseImg, logImg, hslImg;
+    int x, y, width, height;
+    QImage img,img2;
+    Mat srcImg, grayImg, pseImg, logImg, gammaImg, hslImg;
+
 };

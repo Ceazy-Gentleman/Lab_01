@@ -3,17 +3,20 @@
 #include <QLabel>
 #include <QtCore/qmath.h>
 #include <QMessageBox>
+#include <QtDebug>
+#include <QFile>
+#include <QTextStream>
 #include<QPainter>
+
 #include <opencv2/opencv.hpp>
 
-
+using namespace cv;
 using namespace std;
 
 Lab_01::Lab_01(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    isOpenFile = false;
     //QRect rectangle(x, y, width, height);
     connect(ui.open, &QPushButton::clicked, this, &Lab_01::open_clicked);
     connect(ui.save, &QPushButton::clicked, this, &Lab_01::save_clicked);
@@ -23,40 +26,63 @@ Lab_01::Lab_01(QWidget *parent)
     connect(ui.pseudo, &QPushButton::clicked, this, &Lab_01::pseudoColor_clicked);
     //connect(ui.rectangle, &QPushButton::clicked, this, &Lab_01::paintEvent);
     //ui.unIabel->installEventFilter(this);
+    connect(ui.radioButton, &QRadioButton::clicked, [=]() {
+        gray = true;
+        histogram_Balanced();
+        });
+    connect(ui.radioButton_2, &QRadioButton::clicked, [=]() {
+        gray = false;
+        histogram_Balanced();
+        });
+
 } 
+//生成日志
+
 
 //打开图片
 void Lab_01::open_clicked() {
     imgPath = QFileDialog::getOpenFileName(this, "请选择图片", ".", "Image Files(*.jpg *.png *.bmp *.pgm *.pbm);;All(*.*)");
     if (img.load(imgPath)) {
-        isOpenFile = true;
         Mat img1;
-        hslImg=srcImg= imread(imgPath.toUtf8().data());
+        srcImg= imread(imgPath.toUtf8().data());
         cvtColor(srcImg, img1, COLOR_BGR2RGB); //将imread得到的BRG Mat转换成RGB Mat
         QImage img2 = QImage((const unsigned char*)(img1.data), img1.cols, img1.rows, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
         ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+        img = (ui.unIabel->pixmap()->toImage()).copy();
     }
 }
 //绘制矩形框
 void Lab_01::rectangle_clicked() {
-    QImage img2= ui.unIabel->pixmap()->toImage();
+    //读取图片及参数
+    QImage img2;
+    img2 = img;
+    x = ui.X->value();
+    y = ui.Y->value();
+    width = ui.Width->value();
+    height = ui.Height->value();
+
+    //设置绘图设备绘图
     QPainter painter(&img2);
-    QPen pen(Qt::green, 3, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+    QPen pen(Qt::green, 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
     painter.setPen(pen);
-    painter.drawRect(QRect(50, 50, 100, 100));
+    painter.drawRect(QRect(x, y, width, height));
+
+    //显示图片
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
 }//todo 1.利用绘图事件实现鼠标画图功能 2.参数调整按钮
 
 //选取矩形框
 void Lab_01::checkout_clicked() {
-    QImage img2 = (ui.unIabel->pixmap()->toImage()).copy(QRect(50, 50, 100, 100));
-    srcImg = Mat(img2.height(), img2.width(), CV_8UC3, (void*)img2.constBits(), img2.bytesPerLine());//QImage转Mat
+    img2 = (ui.unIabel->pixmap()->toImage()).copy(QRect(x, y, width, height));
+    srcImg = Mat(img2.height(), img2.width(), CV_8UC4, (void*)img2.constBits(), img2.bytesPerLine()).clone();//QImage转Mat,图像数据共享内存了。。。
+    imshow("显示图像", srcImg);
+    //imshow("显示图像", srcImg);
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
 }
 //保存图片
 void Lab_01::save_clicked() {
     savePath= QFileDialog::getSaveFileName(this,"保存图片","",tr("*.bmp;; *.png;; *.jpg;; *.tif;; *.GIF"));
-    QImage img2 = ui.unIabel->pixmap()->toImage();
+    img2 = ui.unIabel->pixmap()->toImage();
     if (savePath.isEmpty())
     {
         return;
@@ -65,96 +91,135 @@ void Lab_01::save_clicked() {
     {
         if (!(img2.save(savePath))) //保存图像
         {
-            QMessageBox::information(this,
-                tr("Failed to save the image"),
-                tr("Failed to save the image!"));
+            QMessageBox::information(this,"error",tr("Failed to save the image!"));
             return;
         }
         ui.statusBar->showMessage("Successfully");
-        
     }
 }
 
 
 //灰度化
 void Lab_01::gray_clicked() {
-    QImage img2 = (ui.unIabel->pixmap()->toImage()).convertToFormat(QImage::Format_Grayscale8, Qt::AutoColor);
-    //for (int i = 50; i < 150; i++)
-    //{
-    //    for (int j = 50; j < 150; j++)
-    //    {
-    //        QRgb pixel = img2.pixel(i, j);
-    //        int r = qRed(pixel);
-    //        int g = qGreen(pixel);
-    //        int b = qBlue(pixel);
-    //        //img2.setPixel(i, j, qGray(r, g, b));
-    //        int average = (r * 0.299 + g * 0.587 + b * 0.114);//效果更好，精度问题，这样算的精度更高
-    //        img2.setPixel(i,j,qRgb(average, average, average));
-    //    }
-    //}
-    //cvtColor(srcImg, grayImg, COLOR_BGR2GRAY);
-    //Mat temp;
-    //cvtColor(grayImg, temp, COLOR_GRAY2RGB); //将imread得到的BRG Mat转换成RGB Mat
-    //QImage img2 = QImage((const unsigned char*)(temp.data), temp.cols, temp.rows, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
+    cvtColor(srcImg, grayImg, CV_BGR2GRAY);
+    imshow("显示图像", srcImg);
+    img2 = QImage((const unsigned char*)(grayImg.data), grayImg.cols, grayImg.rows, grayImg.step, QImage::Format_Grayscale8);
+    if (img2.isNull()) {
+        QMessageBox::warning(this, "提示", "图片转换错误", QMessageBox::Yes | QMessageBox::Yes);
+    }
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
-
-}//todo 整数精度教程 ,Mat 灰度图转QImage 灰度图失败也不知到什么原因
+}
 
 
 //伪彩色图
 void Lab_01::pseudoColor_clicked() {
-    //Mat img1;
-    cvtColor(srcImg, grayImg, COLOR_BGR2GRAY);
-    applyColorMap(grayImg, pseImg, COLORMAP_HSV);
-    QImage img2 = QImage((const unsigned char*)(pseImg.data), pseImg.cols, pseImg.rows, pseImg.step, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
-    //cvtColor(pseImg, img1, COLOR_GRAY2RGB); //Mat转换成RGB Mat
-    //QImage img2 = QImage((const unsigned char*)(img1.data), img1.cols, img1.rows,img1.step, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
+    applyColorMap(grayImg, pseImg, COLORMAP_JET);
+    img2 = QImage((const unsigned char*)(pseImg.data), pseImg.cols, pseImg.rows, pseImg.step, QImage::Format_RGB888);//将RGB Mat格式转化为QImage格式
     ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
 }
 
 //对数变换
-void Lab_01::log_Changed(int log_r)
+void Lab_01::log_Changed(int c)
 {
-      grayImg.convertTo(logImg, CV_32F, 1.0 / 255, 0);
-      logImg = log_r * logImg + 1;
-      log(logImg, logImg);
-      logImg = logImg / log(log_r + 1);
-      logImg.convertTo(logImg, CV_8U, 255, 0);
-      cvtColor(logImg, logImg, COLOR_BGR2RGB);
-      QImage img2((const unsigned char*)logImg.data, logImg.cols, logImg.rows, logImg.step, QImage::Format_RGB888);
-      ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
-}
-//绘制矩形框
-//void Lab_01::paintEvent(QPaintEvent*) {
-//    if (imgPath.isEmpty())
-//    {
-//        return;
-//    }
-//    else {
-//        //实例化画家对象
-//        QPainter painter(ui.unIabel);
-//        QPen pen(QColor(255, 0, 0));
-//        painter.setPen(pen);
-//        pen.setWidth(2);
-//        painter.drawRect(QRect(20, 20, 50, 50));
-//    }
-//
-//
-//}
+    //预处理
+    imshow("对数图片", grayImg);
+    Mat grayImg1 = grayImg.clone();
+    logImg = Mat::zeros(grayImg1.size(), grayImg1.type());
 
-//QImage Lab_01::Center(QImage  qimage, QLabel* qLabel)
-//{
-//    QImage image;
-//    QSize imageSize = qimage.size();
-//    QSize labelSize = qLabel->size();
-//
-//    double dWidthRatio = 1.0 * imageSize.width() / labelSize.width();
-//    double dHeightRatio = 1.0 * imageSize.height() / labelSize.height();
-//    if (dWidthRatio > dHeightRatio) {
-//        image = qimage.scaledToWidth(labelSize.width());
-//    }
-//    else {
-//        image = qimage.scaledToHeight(labelSize.height());
-//    }
-//    return image;
-//}
+    //计算
+    add(grayImg1, Scalar(1.0), grayImg1);//计算r+1
+    grayImg1.convertTo(grayImg1, CV_32F);//转为单精度浮点数
+    log(grayImg1, logImg);//计算log（r+1)
+    logImg = c * logImg;
+    normalize(logImg, logImg, 0, 255, NORM_MINMAX);//归一化处理
+
+    //图像转换
+    logImg.convertTo(logImg, CV_8UC1);
+    img2 = QImage((const unsigned char*)logImg.data, logImg.cols, logImg.rows, logImg.step, QImage::Format_Grayscale8);
+    ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+}
+
+//伽马变换
+
+void Lab_01::gamma_Changed(double r)
+{
+    //预处理
+    Mat grayImg1 = grayImg.clone();
+    imshow("对数图片", grayImg1);
+    gammaImg = Mat::zeros(grayImg1.size(), grayImg1.type());
+    grayImg1.convertTo(grayImg1, CV_64FC1);//转为双精度浮点数
+
+    //计算
+    cv::pow(grayImg1, r, gammaImg);
+
+    //图像转换
+    gammaImg.convertTo(gammaImg, CV_8UC1);
+    img2 = QImage((const unsigned char*)gammaImg.data, gammaImg.cols, gammaImg.rows, gammaImg.step, QImage::Format_Grayscale8);
+    ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+}
+
+
+//hsl调整
+void Lab_01::hsl_Changed(int value) 
+{
+    Q_UNUSED(value);
+
+    //预处理
+    Mat srcImg1,final;
+    vector<Mat> channels(3);
+    cvtColor(srcImg, srcImg1, CV_BGRA2BGR);
+    float delta_h = ui.HspinBox->value();
+    float delta_s = ui.SspinBox_2->value();
+    float delta_l = ui.LspinBox_3->value();
+    //imshow("原图", srcImg1);
+
+    //图像转化处理
+    srcImg1.convertTo(srcImg1, CV_32F, 1.0 / 255, 0);
+    cvtColor(srcImg1, hslImg, COLOR_BGR2HLS);
+    split(hslImg, channels);
+
+    //单层计算
+    add(channels.at(0), Scalar(delta_h), channels.at(0));
+    add(channels.at(1), Scalar(delta_l/100.0), channels.at(1));
+    add(channels.at(2), Scalar(delta_s/100.0), channels.at(2));
+
+    //合成显示
+    merge(channels, hslImg);
+    //imshow("变换后hsl图", hslImg);
+    cvtColor(hslImg, hslImg, COLOR_HLS2RGB);
+    hslImg.convertTo(hslImg, CV_8U,255,0);
+    img2 = QImage((const unsigned char*)hslImg.data, hslImg.cols, hslImg.rows, hslImg.step, QImage::Format_RGB888);
+    ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+
+}
+
+//直方图均衡
+void Lab_01::histogram_Balanced() {
+    Mat equalImg;   
+    vector<Mat> channels;
+    if (gray) {
+        imshow("灰度图", grayImg);
+        equalizeHist(grayImg, equalImg);
+        img2 = QImage((const unsigned char*)(grayImg.data), grayImg.cols, grayImg.rows, grayImg.step, QImage::Format_Grayscale8);
+        ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+    }
+    else {
+        //图像转换
+        cvtColor(srcImg, equalImg, CV_BGRA2BGR);
+        imshow("k", equalImg);
+        cvtColor(equalImg, equalImg, CV_BGR2YCrCb);
+
+        //均衡处理
+        split(equalImg, channels);
+        equalizeHist(channels[0], channels[0]);
+        merge(channels, equalImg);
+
+        //图像显示
+        cvtColor(equalImg, equalImg, CV_YCrCb2RGB);
+        img2 = QImage((const unsigned char*)(equalImg.data), equalImg.cols, equalImg.rows, equalImg.step, QImage::Format_RGB888);
+        ui.unIabel->setPixmap(QPixmap::fromImage(img2.scaled(ui.unIabel->size(), Qt::KeepAspectRatio)));
+    }
+}
+
+
