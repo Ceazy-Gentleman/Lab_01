@@ -8,7 +8,6 @@
 #include <QFile>
 #include <QTextStream>
 #include<QPainter>
-
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -35,7 +34,15 @@ Lab_01::Lab_01(QWidget *parent)
         gray = false;
         histogram_Balanced();
         });
-
+    connect(ui.end_log, &QPushButton::clicked, [=]() {
+        records.push_back(*(ui.unIabel->pixmap()));
+        });
+    connect(ui.end_gamma, &QPushButton::clicked, [=]() {
+        records.push_back(*(ui.unIabel->pixmap()));
+        });
+    connect(ui.end_hsl, &QPushButton::clicked, [=]() {
+        records.push_back(*(ui.unIabel->pixmap()));
+        });
 } 
 
 
@@ -57,6 +64,9 @@ void Lab_01::open_clicked() {
         qDebug() << "成功打开图片" << "  耗时：" << time0 << "ms";
         ui.statusBar->showMessage("加载图片, 耗时：" + QString("%1").arg(time0) + "ms");
 
+        //撤销记录
+        QPixmap a = (*(ui.unIabel->pixmap())).copy();
+        records.push_back(a);
     }
 }
 //绘制矩形框
@@ -84,7 +94,7 @@ void Lab_01::rectangle_clicked() {
     qDebug()<<"成功绘制矩形框"<<"  耗时："<<time0<<"ms";
     ui.statusBar->showMessage("绘制ROI, 耗时：" + QString("%1").arg(time0) + "ms");
 
-}//todo 1.利用绘图事件实现鼠标画图功能 2.参数调整按钮
+}//todo 1.利用绘图事件实现鼠标画图功能
 
 //选取矩形框
 void Lab_01::checkout_clicked() {
@@ -99,6 +109,10 @@ void Lab_01::checkout_clicked() {
     time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
     qDebug() << "成功选取选定区域" << "  耗时：" << time0 << "ms";
     ui.statusBar->showMessage("选取ROI, 耗时：" + QString("%1").arg(time0) + "ms");
+
+    //撤销记录
+    QPixmap a = (*(ui.unIabel->pixmap())).copy();
+    records.push_back(a);
 
 }
 //保存图片
@@ -122,6 +136,7 @@ void Lab_01::save_clicked() {
         time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
         ui.statusBar->showMessage("保存图片, 耗时："+ QString("%1").arg(time0)+"ms");
         qDebug() << "成功保存图片" << "  耗时：" << time0 << "ms";
+
     }
 }
 
@@ -142,6 +157,9 @@ void Lab_01::gray_clicked() {
     qDebug() << "灰度处理" << "  耗时：" << time0 << "ms";
     ui.statusBar->showMessage("灰度变换, 耗时：" + QString("%1").arg(time0) + "ms");
 
+
+    QPixmap a = (*(ui.unIabel->pixmap())).copy();
+    records.push_back(a);
 }
 
 
@@ -156,6 +174,9 @@ void Lab_01::pseudoColor_clicked() {
     time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
     ui.statusBar->showMessage("伪彩色图变换, 耗时：" + QString("%1").arg(time0) + "ms");
     qDebug() << "生成伪彩色图" << "  耗时：" << time0 << "ms";
+
+    QPixmap a = (*(ui.unIabel->pixmap())).copy();
+    records.push_back(a);
 
 }
 
@@ -250,6 +271,7 @@ void Lab_01::hsl_Changed(int value)
     time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
     ui.statusBar->showMessage("hsl变换, 耗时：" + QString("%1").arg(time0) + "ms");
     qDebug() << "hsl调整" << "  耗时：" << time0 << "ms";
+
 }
 
 //直方图均衡
@@ -269,6 +291,7 @@ void Lab_01::histogram_Balanced() {
         ui.statusBar->showMessage("灰度直方图均衡, 耗时：" + QString("%1").arg(time0) + "ms");
         qDebug() << "灰度直方图均衡" << "  耗时：" << time0 << "ms";
 
+        records.push_back(*(ui.unIabel->pixmap()));
     }
     else {
         double time0 = static_cast<double>(getTickCount());
@@ -291,7 +314,22 @@ void Lab_01::histogram_Balanced() {
         time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
         ui.statusBar->showMessage("彩色直方图均衡, 耗时：" + QString("%1").arg(time0) + "ms");
         qDebug() << "彩色直方图均衡" << "  耗时：" << time0 << "ms";
+
+        records.push_back(*(ui.unIabel->pixmap()));
     }
+}
+
+void Lab_01::withdraw_clicked() {
+    double time0 = static_cast<double>(getTickCount());
+    //--rd;?为什么啊，为什么这样使用就有问题啊
+    records.pop_back();
+    rd = records.end();
+    --rd;
+    ui.unIabel->setPixmap(*rd);
+
+    time0 = 1000 * ((double)getTickCount() - time0) / getTickFrequency();
+    ui.statusBar->showMessage("撤销操作, 耗时：" + QString("%1").arg(time0) + "ms");
+    qDebug() << "撤销操作" << "  耗时：" << time0 << "ms";
 }
 
 

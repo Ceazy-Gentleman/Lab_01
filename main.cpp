@@ -38,6 +38,14 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     qInstallMessageHandler(outputMessage);
+
+    // 清空之前已有的日志文件
+    QFile file("log.txt");
+    if (file.exists()) {
+        file.open(QIODevice::WriteOnly);
+        file.close();
+    }
+
     Lab_01 w;
     w.show();
     return a.exec();

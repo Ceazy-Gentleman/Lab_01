@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1041</width>
-    <height>625</height>
+    <width>1081</width>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,19 +25,6 @@
     </property>
     <property name="text">
      <string> 打开</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="unIabel">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>80</y>
-      <width>561</width>
-      <height>431</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="save">
@@ -85,7 +72,7 @@
       <x>673</x>
       <y>50</y>
       <width>20</width>
-      <height>521</height>
+      <height>551</height>
      </rect>
     </property>
     <property name="orientation">
@@ -97,8 +84,8 @@
      <rect>
       <x>710</x>
       <y>5</y>
-      <width>260</width>
-      <height>561</height>
+      <width>278</width>
+      <height>660</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -259,15 +246,8 @@
        <property name="flat">
         <bool>true</bool>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>C：</string>
-          </property>
-         </widget>
-        </item>
-        <item>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="1" column="1">
          <widget class="QSpinBox" name="spinBox1">
           <property name="minimum">
            <number>1</number>
@@ -283,10 +263,31 @@
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="end_log">
+          <property name="text">
+           <string>确定</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" colspan="2">
          <widget class="QSlider" name="horizontalSlider1">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>C：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="QPushButton" name="start_log">
+          <property name="text">
+           <string>开始调整</string>
           </property>
          </widget>
         </item>
@@ -304,28 +305,42 @@
        <property name="flat">
         <bool>true</bool>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="1" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>γ：</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QPushButton" name="start_gamma">
+          <property name="text">
+           <string>开始调整</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
          <widget class="QDoubleSpinBox" name="doubleSpinBox">
           <property name="singleStep">
            <double>0.100000000000000</double>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="1" column="2">
          <widget class="QSlider" name="horizontalSlider">
           <property name="value">
            <number>0</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="end_gamma">
+          <property name="text">
+           <string>确定</string>
           </property>
          </widget>
         </item>
@@ -344,21 +359,35 @@
         <bool>true</bool>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
+        <item row="0" column="1" colspan="3">
+         <widget class="QPushButton" name="start_hsl">
+          <property name="text">
+           <string>开始调整</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" rowspan="2">
+         <widget class="QPushButton" name="end_hsl">
+          <property name="text">
+           <string>确定</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" rowspan="2" colspan="2">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>H：</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="1" column="2" rowspan="2">
          <widget class="QSpinBox" name="HspinBox">
           <property name="maximum">
            <number>360</number>
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
+        <item row="2" column="3" colspan="2">
          <widget class="QSlider" name="HhorizontalSlider_2">
           <property name="maximum">
            <number>360</number>
@@ -368,14 +397,14 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>S:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="3" column="2">
          <widget class="QSpinBox" name="SspinBox_2">
           <property name="minimum">
            <number>0</number>
@@ -388,7 +417,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="3" column="3" colspan="2">
          <widget class="QSlider" name="ShorizontalSlider_3">
           <property name="maximum">
            <number>100</number>
@@ -398,14 +427,14 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_5">
           <property name="text">
            <string>L:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="4" column="2">
          <widget class="QSpinBox" name="LspinBox_3">
           <property name="minimum">
            <number>0</number>
@@ -418,7 +447,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
+        <item row="4" column="3" colspan="2">
          <widget class="QSlider" name="LhorizontalSlider_4">
           <property name="maximum">
            <number>100</number>
@@ -439,25 +468,61 @@
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QRadioButton" name="radioButton">
-          <property name="text">
-           <string>灰度图</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton_2">
-          <property name="text">
-           <string>彩色图</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QRadioButton" name="radioButton">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>27</y>
+          <width>72</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>灰度图</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioButton_2">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>30</y>
+          <width>72</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>彩色图</string>
+        </property>
+       </widget>
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="Withdraw">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>10</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>撤销</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="unIabel">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>100</y>
+      <width>601</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -465,7 +530,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1041</width>
+     <width>1081</width>
      <height>26</height>
     </rect>
    </property>
@@ -901,11 +966,29 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>Withdraw</sender>
+   <signal>clicked()</signal>
+   <receiver>Lab_01Class</receiver>
+   <slot>withdraw_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>496</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>520</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>log_Changed(int)</slot>
   <slot>gamma_Changed(double)</slot>
   <slot>hsl_Changed(int)</slot>
   <slot>rectangle_clicked()</slot>
+  <slot>withdraw_clicked()</slot>
+  <slot>gray_clicked()</slot>
  </slots>
 </ui>

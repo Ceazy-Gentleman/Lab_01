@@ -4,6 +4,7 @@
 #include <QtDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QVector>
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
@@ -27,6 +28,7 @@ private slots:
     void gamma_Changed(double);
     void hsl_Changed(int);
     void histogram_Balanced();
+    void withdraw_clicked();
 private:
     Ui::Lab_01Class ui;
 
@@ -36,5 +38,6 @@ private:
     int x, y, width, height;
     QImage img,img2;
     Mat srcImg, grayImg, pseImg, logImg, gammaImg, hslImg;
-
+    QVector<QPixmap> records;
+    QVector<QPixmap>::iterator rd;
 };
